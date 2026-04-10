@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>野性人格测试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:#0a0a14;color:#e8e8f4;min-height:100vh}
+
+.bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(167,94,234,.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(55,66,250,.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(46,213,115,.05) 0%, transparent 50%)}
+
+.wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:36px 16px 72px}
+
+.welcome{text-align:center;padding:40px 12px 28px}
+.logo{font-size:72px;display:block}
+h1{font-size:36px;font-weight:900;margin-top:14px;
+  background:linear-gradient(135deg,#ff4757,#a55eea,#3742fa,#2ed573);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:3px}
+.sub{font-size:14px;color:#8888aa;margin-top:8px}
+.zacat{font-size:18px;margin-top:10px;opacity:.7;display:inline-block;animation:floatZ 3s ease-in-out infinite}
+@keyframes floatZ{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.desc-box{background:#12122e;border:1px solid rgba(255,255,255,.06);border-radius:18px;
+  padding:22px;margin-top:24px;font-size:14px;line-height:1.9;color:#8888aa}
+.desc-box strong{color:#e8e8f4}
+
+.btn-start{display:inline-block;margin-top:32px;padding:18px 48px;font-size:20px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,#ff4757,#a55eea);border:none;border-radius:30px;
+  cursor:pointer;transition:.3s;letter-spacing:2px}
+.btn-start:hover{transform:scale(1.05);box-shadow:0 8px 30px rgba(168,85,247,.4)}
+
+/* Question Screen */
+.q-wrap{display:none;text-align:center}
+.q-num{display:inline-block;background:rgba(168,85,247,.15);color:#a55eea;
+  padding:4px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:20px}
+.q-text{font-size:22px;font-weight:700;line-height:1.5;margin-bottom:28px;padding:0 8px}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{background:#12122e;border:1px solid rgba(255,255,255,.06);border-radius:16px;
+  padding:18px 20px;text-align:left;cursor:pointer;transition:.25s;display:block;text-decoration:none;color:inherit}
+.opt:hover{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.3);transform:translateX(6px)}
+.opt-i{font-size:28px;margin-right:12px;vertical-align:middle}
+.opt-t{font-size:16px;font-weight:600;vertical-align:middle}
+.opt-d{font-size:12px;color:#8888aa;margin-top:6px;line-height:1.5}
+
+/* Result Screen */
+.res-wrap{display:none;text-align:center}
+.res-card{background:#12122e;border:1px solid rgba(255,255,255,.06);border-radius:24px;
+  padding:40px 28px;margin-top:20px}
+.res-icon{font-size:80px;display:block;margin-bottom:12px}
+.res-type{font-size:42px;font-weight:900;margin-bottom:8px;
+  background:linear-gradient(135deg,#ffa502,#ff4757);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.res-name{font-size:18px;color:#8888aa;margin-bottom:24px}
+.res-desc{font-size:14px;line-height:2;text-align:left;color:#ccc}
+.res-bar-wrap{margin-top:28px;text-align:left}
+.res-bar-item{margin-bottom:16px}
+.res-bar-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.res-bar-track{height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+.res-bar-fill{height:100%;border-radius:5px;transition:width .8s ease}
+.bar-p{background:linear-gradient(90deg,#ff4757,#ff6b81)}
+.bar-i{background:linear-gradient(90deg,#a55eea,#d68aff)}
+.bar-b{background:linear-gradient(90deg,#3742fa,#5a6bff)}
+.bar-d{background:linear-gradient(90deg,#2ed573,#7bed9f)}
+
+.btn-restart{display:inline-block;margin-top:32px;padding:14px 36px;font-size:16px;font-weight:600;
+  color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:24px;
+  cursor:pointer;transition:.3s;text-decoration:none}
+.btn-restart:hover{background:rgba(255,255,255,.15)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .5s ease both}
+</style>
+</head>
+<body>
+
+<div class="bg-fx"></div>
+
+<div class="wrap">
+
+  <!-- Welcome -->
+  <div id="welcome" class="welcome">
+    <span class="logo">&#x1F43A;</span>
+    <h1>野性人格测试</h1>
+    <span class="zacat">&#x1F431; 榨菜喵</span>
+    <p class="sub">10道题，发现你内心的动物灵魂</p>
+    <div class="desc-box">
+      <strong>&#x2728; 测试说明：</strong><br>
+      每道题有3个选项，凭直觉选择最贴合你的答案。<br>
+      测完后将根据四个维度生成你的专属动物人格。<br>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+        <span style="background:rgba(255,255,255,.02);padding:8px;border-radius:8px;font-size:12px">P 群居 / 独行</span>
+        <span style="background:rgba(255,255,255,.02);padding:8px;border-radius:8px;font-size:12px">I 直觉 / 嗅觉</span>
+        <span style="background:rgba(255,255,255,.02);padding:8px;border-radius:8px;font-size:12px">B 硬核 / 温柔</span>
+        <span style="background:rgba(255,255,255,.02);padding:8px;border-radius:8px;font-size:12px">D 宅家 / 漂泊</span>
+      </div>
+    </div>
+    <button class="btn-start" onclick="go()">&#x1F984; 开始觉醒 &#x2192;</button>
+  </div>
+
+  <!-- Question -->
+  <div id="qwrap" class="q-wrap">
+    <div class="q-num" id="qnum">Q 1 / 10</div>
+    <div class="q-text" id="qtext">问题加载中...</div>
+    <div class="opts" id="qopts"></div>
+  </div>
+
+  <!-- Result -->
+  <div id="res" class="res-wrap">
+    <h1 style="font-size:28px;margin-bottom:8px">觉醒完成</h1>
+    <p class="sub" style="margin-bottom:20px">你内心的动物灵魂是...</p>
+    <div class="res-card">
+      <span class="res-icon" id="ricon">&#x1F43A;</span>
+      <div class="res-type" id="rtype">狼人</div>
+      <div class="res-name" id="rname">Pack Wolf</div>
+      <div class="res-desc" id="rdesc"></div>
+      <div class="res-bar-wrap" id="rbars"></div>
+    </div>
+    <button class="btn-restart" onclick="location.reload()">&#x1F504; 再测一次</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var DIMS = {
+  P:{name:'群居 Pack', la:'&#x1F43A;', lb:'&#x1F98A;', ln:'群居', rn:'独行'},
+  I:{name:'直觉 Instinct', la:'&#x1F52E;', lb:'&#x1F441;&#xFE0F;', ln:'直觉', rn:'嗅觉'},
+  B:{name:'獠牙 Fang', la:'&#x2694;&#xFE0F;', lb:'&#x1F91D;', ln:'硬核', rn:'温柔'},
+  D:{name:'巢穴 Den', la:'&#x1F3E0;', lb:'&#x1F32A;&#xFE0F;', ln:'宅家', rn:'漂泊'}
+};
+
+var QS = [
+  {
+    dim:'P',
+    q:'周末到了，你最真实的操作是？',
+    a:{i:'&#x1F389;', t:'已经约了三场局', d:'KTV -> 火锅 -> 桌游，人越多我越兴奋'},
+    m:{i:'&#x2615;', t:'看心情随机应变', d:'有局就去凑个热闹，没局自己躺平也挺好'},
+    b:{i:'&#x1F6CB;', t:'拉上窗帘谁也别来', d:'终于可以当废柴了！外卖叫到门口，手机静音'}
+  },
+  {
+    dim:'I',
+    q:'让你选一种超能力，你本能想要的是？',
+    a:{i:'&#x1F300;', t:'预知未来（模糊版）', d:'突然感觉今天不宜出门，然后果然踩到狗屎'},
+    m:{i:'&#x1F3AF;', t:'过目不忘（有限版）', d:'看过的东西大概记得住七成，够用了吧'},
+    b:{i:'&#x1F4D0;', t:'微观放大镜眼', d:'能看见细菌在桌面上蹦迪，数清对面有多少根睫毛'}
+  },
+  {
+    dim:'B',
+    q:'你最好的朋友被人欺负了，第一反应是？',
+    a:{i:'&#x2694;&#xFE0F;', t:'抄家伙上！', d:'欺负我的人就不行！打不过也要摆出拼命架势'},
+    m:{i:'&#x2696;&#xFE0F;', t:'先搞清楚情况', d:'如果是朋友的错就劝TA道歉，否则一起想办法反击'},
+    b:{i:'&#x1F91D;', t:'默默陪TA疗伤', d:'先带朋友吃顿好的，情绪稳定再谈正事'}
+  },
+  {
+    dim:'D',
+    q:'给你一个月假期和无限预算，你会怎么安排？',
+    a:{i:'&#x2708;&#xFE0F;', t:'环球旅行！', d:'冰岛看极光 -> 东非大草原 -> 日本泡温泉'},
+    m:{i:'&#x1F3DB;', t:'换个城市长住', d:'去一个陌生的城市租个民宿，像当地人一样生活一个月'},
+    b:{i:'&#x1F6C2;', t:'宅家深度进化', d:'把想看的书/剧全部刷完，点最好的外卖，谁也别烦我'}
+  },
+  {
+    dim:'P',
+    q:'团队项目中，你通常是哪个角色？',
+    a:{i:'&#x1F4AC;', t:'气氛组担当', d:'负责活跃气氛、协调关系、确保大家开心'},
+    m:{i:'&#x1F527;', t:'技术核心', d:'话不多但活儿靠谱，关键时候能扛事'},
+    b:{i:'&#x1F9D9;', t:'幕后军师', d:'喜欢在旁边观察分析，关键时刻给出致命一击般的建议'}
+  },
+  {
+    dim:'I',
+    q:'第一次见一个人，你更依赖什么判断？',
+    a:{i:'&#x1F52E;', t:'第六感/直觉', d:'说不上来为什么，就是觉得这个人可以/不可以信任'},
+    m:{i:'&#x1F441;&#xFE0F;', t:'细节观察', d:'从穿着、微表情、说话方式拼凑出这个人的画像'},
+    b:{i:'&#x1F4DD;', t:'实际接触验证', d:'直觉不靠谱，得共事一段时间才能下结论'}
+  },
+  {
+    dim:'B',
+    q:'面对一个几乎不可能完成的挑战，你倾向于？',
+    a:{i:'&#x1F511;', t:'硬刚到底！', d:'越是不可能越要试试，万一成功了呢'},
+    m:{i:'&#x1F9E0;', t:'智取为上', d:'正面刚肯定不行，但总会有巧妙的办法绕过去'},
+    b:{i:'&#x1F494;', t:'评估后量力而行', d:'如果真的不可能就及时止损，没必要当无谓的英雄'}
+  },
+  {
+    dim:'D',
+    q:'理想居住环境是什么？',
+    a:{i:'&#x1F3E1;', t:'市中心大平层', d:'出门就是商场地铁站，要啥有啥'},
+    m:{i:'&#x1F33D;', t:'郊区别墅带花园', d:'远离喧嚣但有车方便进城，鱼和熊掌兼得'},
+    b:{i:'&#x1F3D8;', t:'深山小屋', d:'方圆十里没有人烟，只有我和自然'}
+  },
+  {
+    dim:'I',
+    q:'做重要决定时，你的决策模式是？',
+    a:{i:'&#x2728;', t:'跟着感觉走', d:'想太多反而会错，第一反应往往是最真实的'},
+    m:{i:'&#x1F4CA;', t:'列优缺点清单', d:'理性分析每个选项的利弊，选得分最高的'},
+    b:{i:'&#x1F50D;', t:'疯狂搜集信息', d:'必须把所有相关资料都看完才能做决定'}
+  },
+  {
+    dim:'B',
+    q:'别人评价你最可能用的词是？',
+    a:{i:'&#x1F525;', t:'热血/仗义', d:'为朋友两肋插刀，看到不公平的事就会冲上去'},
+    m:{i:'&#x1F60E;', t:'淡定/佛系', d:'天塌下来当被子盖，很少有事情能让我慌'},
+    b:{i:'&#x2764;&#xFE0F;', t:'温柔/体贴', d:'总能察觉到别人的情绪变化，很会照顾人'}
+  }
+];
+
+var RESULTS = [
+  {icon:'&#x1F43A;', type:'孤狼', name:'Lone Wolf',
+   desc:'你是一只独行却强大的狼。不依赖群体也能活得精彩，内心强大到不需要讨好任何人。你对人和事都有敏锐的嗅觉，一旦认定目标就咬定不放。虽然外表高冷，但对真正进入你领地的人会付出全部忠诚。',
+   bars:{P:15,I:85,B:70,D:65}},
+  {icon:'&#x1F98A;', type:'赤狐', name:'Red Fox',
+   desc:'你是一只聪明狡黠的狐狸。社交场上如鱼得水，知道什么时候该笑、什么时候该藏。直觉准得可怕，总能比别人早一步嗅到机会或危险。你不是最强壮的那个，但你一定是最难被抓住的。温柔只是你的伪装，骨子里精明得很。',
+   bars:{P:75,I:90,B:35,D:55}},
+  {icon:'&#x1F995;', type:'独角兽', name:'Unicorn',
+   desc:'你就是传说中那个稀有的存在。独立特行，不在乎别人的眼光。直觉强到近乎玄学，常常说出让人事后才恍然大悟的话。外表看起来温和无害，但真惹急了你，那根独角可不是摆设。你的世界普通人进不来，也不需要他们进来。',
+   bars:{P:20,I:95,B:55,D:80}},
+  {icon:'&#x1F991;', type:'狮子王', name:'Lion King',
+   desc:'天生的领袖气质。你喜欢人群围绕的感觉，在群体中总是不知不觉成为焦点。做事直接果断，看不惯拐弯抹角。你的领地意识很强，对自己认定的"族群"极度忠诚。虽然偶尔显得霸道，但大家都知道你是可以依靠的那个人。',
+   bars:{P:90,I:60,B:85,D:45}},
+  {icon:'&#x1F98F;', type:'猫头鹰智者', name:'Wise Owl',
+   desc:'夜色中的观察者。你话不多，但说出来的每句话都经过深思熟虑。比起热闹的聚会，更愿意独自待在安静的角落思考人生。直觉和理性并重，很少冲动行事。朋友们有难题都会来找你，因为你总能给出最有洞察力的建议。',
+   bars:{P:25,I:88,B:40,D:90}},
+  {icon:'&#x1F436;', type:'金毛骑士', name:'Golden Retriever',
+   desc:'你就是那个让所有人都感到温暖的存在。群居属性满格，朋友遍天下。永远相信世界是善良的，对陌生人也能掏心掏肺。虽然偶尔会因为太容易相信人而受伤，但你从不后悔自己的真诚。这个世界需要更多像你这样的人。',
+   bars:{P:95,I:70,B:30,D:50}},
+  {icon:'&#x1F41A;', type:'深海章鱼', name:'Deep Sea Octopus',
+   desc:'神秘而复杂的生物。表面上看你可能是个安静的家伙，但实际上你有八种不同的思维模式同时运转。直觉惊人地准确，社交能力也不差，只是你选择性地使用它们。没人真正看透你，而你觉得这样挺好。',
+   bars:{P:55,I:92,B:60,D:75}},
+  {icon:'&#x1F996;', type:'水牛', name:'Water Buffalo',
+   desc:'稳重可靠的大佬。话少活好，承诺的事一定做到。你不追求光鲜亮丽，但所有人心里都知道：有事找你就对了。对朋友极其护短，平时温温柔柔，一旦触及底线那股蛮力谁都挡不住。你是那种越处越觉得靠谱的人。',
+   bars:{P:65,I:50,B:90,D:85}},
+  {icon:'&#x1F997;', type:'袋鼠', name:'Kangaroo',
+   desc:'充满能量的行动派。闲不住，总想去下一个地方看看。朋友圈子广，走到哪都能交到新朋友。做事风格直来直去，不喜欢拖泥带水。你的育儿袋里装着的是对生活的热情和对新事物的好奇心。虽然偶尔毛手毛脚，但活力本身就是魅力。',
+   bars:{P:80,I:55,B:75,D:25}},
+  {icon:'&#x1F338;', type:'樱花树灵', name:'Sakura Spirit',
+   desc:'温柔到了骨子里。你能感知到周围人最细微的情绪波动，总是默默地照顾每一个人。不喜欢冲突，遇到矛盾第一个想让步。但别以为你好欺负——你的温柔背后是一种坚定的力量，就像春天的樱花，柔软却有顽强的生命力。',
+   bars:{P:60,I:78,B:20,D:70}},
+  {icon:'&#x1F409;', type:'中国龙', name:'Chinese Dragon',
+   desc:'稀有中的稀有——全能型选手。你可以独自称霸也可以统领群雄，可以靠直觉也可以靠逻辑，可以温柔也可以霸气。这种全面的能力让你在任何环境都能适应自如。唯一的问题是有时选择太多反而纠结。你是天生的主角命。',
+   bars:{P:70,I:82,B:80,D:60}},
+  {icon:'&#x1F98E;', type:'鹰眼', name:'Eagle Eye',
+   desc:'高空中的猎手，拥有最敏锐的观察力和直觉。你能在别人还没注意到问题的时候就发现了端倪。独立性强，不喜欢被约束，自由对你来说比什么都重要。看似冷漠，其实只是你的关注点和常人不在一个层面上。',
+   bars:{P:30,I:93,B:72,D:40}}
+];
+
+var curQ = 0;
+var scores = {P:0, I:0, B:0, D:0};
+
+window.go = function() {
+  console.log('go() called!');
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('qwrap').style.display = 'block';
+  document.getElementById('qwrap').className = 'q-wrap fade-in';
+  showQ();
+};
+
+function showQ() {
+  if (curQ >= QS.length) {
+    showResult();
+    return;
+  }
+  var q = QS[curQ];
+  document.getElementById('qnum').innerHTML = 'Q ' + (curQ + 1) + ' / ' + QS.length;
+  document.getElementById('qtext').innerHTML = q.q;
+
+  var html = '';
+  var opts = [
+    {key:'a', data:q.a},
+    {key:'m', data:q.m},
+    {key:'b', data:q.b}
+  ];
+  for (var i = 0; i < opts.length; i++) {
+    var o = opts[i];
+    var cls = o.key === 'a' ? 'bar-p' : o.key === 'm' ? 'bar-i' : 'bar-b';
+    html += '<div class="opt fade-in" onclick="pick(\'' + o.key + '\')">';
+    html += '<span class="opt-i">' + o.data.i + '</span>';
+    html += '<span class="opt-t">' + o.data.t + '</span>';
+    html += '<div class="opt-d">' + o.data.d + '</div>';
+    html += '</div>';
+  }
+  document.getElementById('qopts').innerHTML = html;
+}
+
+window.pick = function(key) {
+  var q = QS[curQ];
+  var pts = key === 'a' ? 2 : key === 'm' ? 1 : 0;
+  scores[q.dim] += pts;
+
+  // 对立维度加分
+  var opp = {P:0, I:0.5, B:0.5, D:0}; // 反向递减
+  if (key === 'b') {
+    scores[q.dim] += 0; // 已经最低
+  }
+
+  curQ++;
+  showQ();
+};
+
+function showResult() {
+  document.getElementById('qwrap').style.display = 'none';
+  document.getElementById('res').style.display = 'block';
+  document.getElementById('res').className = 'res-wrap fade-in';
+
+  // 归一化分数
+  var totalP = 0, totalI = 0, totalB = 0, totalD = 0;
+  for (var j = 0; j < QS.length; j++) {
+    if (QS[j].dim === 'P') totalP += 2;
+    if (QS[j].dim === 'I') totalI += 2;
+    if (QS[j].dim === 'B') totalB += 2;
+    if (QS[j].dim === 'D') totalD += 2;
+  }
+
+  var pct = {
+    P: Math.round(scores.P / totalP * 100),
+    I: Math.round(scores.I / totalI * 100),
+    B: Math.round(scores.B / totalB * 100),
+    D: Math.round(scores.D / totalD * 100)
+  };
+
+  // 选择结果
+  var maxDim = 'P', maxVal = -1;
+  var dims = ['P','I','B','D'];
+  for (var k = 0; k < dims.length; k++) {
+    if (pct[dims[k]] > maxVal) {
+      maxVal = pct[dims[k]];
+      maxDim = dims[k];
+    }
+  }
+
+  // 根据最大维度 + 其他维度组合选结果
+  var idx = (pct.P > 50 ? 1 : 0) + (pct.I > 50 ? 2 : 0) + (pct.B > 50 ? 4 : 0) + (pct.D > 50 ? 8 : 0);
+  idx = idx % RESULTS.length;
+
+  var r = RESULTS[idx];
+  document.getElementById('ricon').innerHTML = r.icon;
+  document.getElementById('rtype').innerHTML = r.type;
+  document.getElementById('rname').innerHTML = r.name;
+  document.getElementById('rdesc').innerHTML = r.desc;
+
+  // 显示维度条
+  var barHtml = '';
+  var barDims = [['P','群居/独行','bar-p'],['I','直觉/嗅觉','bar-i'],['B','硬核/温柔','bar-b'],['D','宅家/漂泊','bar-d']];
+  for (var b = 0; b < barDims.length; b++) {
+    var bd = barDims[b];
+    var val = r.bars[bd[0]] !== undefined ? r.bars[bd[0]] : pct[bd[0]];
+    barHtml += '<div class="res-bar-item">';
+    barHtml += '<div class="res-bar-label"><span>' + DIMS[bd[0]].name + ' ' + DIMS[bd[0]].ln + '/' + DIMS[bd[0]].rn + '</span><span>' + val + '%</span></div>';
+    barHtml += '<div class="res-bar-track"><div class="res-bar-fill ' + bd[2] + '" style="width:' + val + '%"></div></div>';
+    barHtml += '</div>';
+  }
+  document.getElementById('rbars').innerHTML = barHtml;
+}
+
+console.log('WPT loaded! go() function is:', typeof window.go);
+
+})();
+</script>
+</body>
+</html>
